@@ -1,0 +1,55 @@
+<button pButton type="button" label="Change column visibility" (click)="changeColumnVisibility()"></button>
+<button pButton type="button" label="ResetTableConfig" (click)="resetTableConfig()"></button>
+<br />
+<br />
+<p-table
+  [columns]="tableConfig.columns"
+  [value]="starships"
+  [resizableColumns]="true"
+  [reorderableColumns]="true"
+  (onColResize)="saveTableConfig()"
+  #turboTable
+>
+  <ng-template pTemplate="header"  let-columns>
+    <tr>
+      <th
+        *ngFor="let column of columns"
+        [pSortableColumn]="true"
+        pResizableColumn
+        pReorderableColumn
+        [hidden]="!column.visible"
+      >
+        {{ column.header }}
+        <p-sortIcon [field]="column.name"></p-sortIcon>
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-ship let-columns="columns">
+    <tr>
+      <td *ngFor="let column of columns" [hidden]="!column.visible">
+        <div *ngIf="column.type === 'number'">
+          {{ ship[column.name] | number }}
+        </div>
+        <div *ngIf="column.type !== 'number'">
+          {{ ship[column.name] }}
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="summary">
+    <button pButton label="Save Config" (click)="saveTableConfig()"></button>
+  </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="showColumnVisibilityDialog">
+  <p-header>Visible columns</p-header>
+  <div *ngFor="let column of columnsForDialog">
+    <input type="checkbox" [(ngModel)]="column.visible"/>
+    {{ column.header }}
+  </div>
+  <p-footer>
+    <button pButton type="button" label="Apply" (click)="applyChangedColumnVisibility()"></button>
+  </p-footer>
+</p-dialog>
+
+<pre>{{ tableConfig.columns | json }}</pre>
